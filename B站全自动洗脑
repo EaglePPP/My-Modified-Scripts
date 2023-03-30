@@ -1,0 +1,67 @@
+// My Modified Script - Modified version of Original Script by Original Author Candy.
+// Copyright (c) Candy.
+// Original repo https://greasyfork.org/en/scripts/450915-b%E7%AB%99%E8%A7%86%E9%A2%91%E5%8D%95%E6%9B%B2%E5%BE%AA%E7%8E%AF
+// Released under the MIT license
+// ==UserScript==
+// @name         B站视频单曲循环
+// @namespace    http://tampermonkey.net/
+// @version      0.1.1
+// @description  B站内置视频单曲循环播放，按钮在右侧视频栏，视频选集和自动播放处
+// @author       EaglePPP
+// @match        https://www.bilibili.com/video/*
+// @icon         data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==
+// @license MIT
+// @grant        none
+// @icon            
+// @icon64          
+// ==/UserScript==
+
+(function () {
+  'use strict';
+
+  function createLoopButton() {
+    const target = document.getElementsByClassName("next-button")[0];
+    const loopButton = target.cloneNode(true);
+    loopButton.setAttribute("style", "margin-right: 10px");
+    const [text, switchButton] = loopButton.children;
+    text.innerHTML = '全自动洗脑';
+
+    return { loopButton, switchButton };
+  }
+
+  function addLoopButton(loopButton, target) {
+    const parent = target.parentElement;
+    parent.insertBefore(loopButton, target);
+  }
+
+  function toggleLoop(switchButton, video) {
+    switchButton.className = switchButton.className === 'switch-button on' ? 'switch-button' : 'switch-button on';
+    video.loop = switchButton.className === 'switch-button on';
+  }
+
+  function init() {
+    const { loopButton, switchButton } = createLoopButton();
+    const video = document.querySelector("video");
+
+    loopButton.addEventListener('click', () => {
+      toggleLoop(switchButton, video);
+      console.log(video.loop);
+    });
+
+    const target = document.getElementsByClassName("next-button")[0];
+    addLoopButton(loopButton, target);
+
+    // 初始化视频循环状态
+    video.loop = true;
+    switchButton.className = 'switch-button on';
+    console.log("done");
+  }
+
+  // 等待DOM加载完成后初始化
+  document.addEventListener('readystatechange', function () {
+    if (document.readyState === "interactive" || document.readyState === "complete") {
+      setTimeout(init, 1000);
+    }
+  });
+
+})();
